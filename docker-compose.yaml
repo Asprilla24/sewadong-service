@@ -1,0 +1,30 @@
+version: '3'
+services:
+  service:
+    image: sewadong-service:unknown
+    container_name: sewadong-service
+    ports:
+      - "8080:8080"
+    links:
+      - postgresql
+    depends_on:
+      - postgresql
+    environment:
+      - PORT=8080
+      - BASE_PATH=/sewadong
+      - DB_HOST=sewadong-postgres
+      - DB_PORT=5432
+      - DB_NAME=dbsewadong
+      - DB_USERNAME=admin
+      - DB_PASSWORD=admin
+    volumes:
+      - ${PWD:-./}:/srv
+  postgresql:
+    image: postgres:11.2-alpine
+    container_name: sewadong-postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=dbsewadong
