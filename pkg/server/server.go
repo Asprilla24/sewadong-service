@@ -45,6 +45,7 @@ func New(config *config.Config, service *service.Service) *Server {
 	server.container.Add(api.AddRouteRole(service, config.BasePath))
 	server.container.Add(api.AddRouteProduct(service, config.BasePath))
 	server.container.Add(api.AddRouteCategory(service, config.BasePath))
+	server.container.Add(api.AddRouteTransaction(service, config.BasePath))
 	server.registerSwaggerUI()
 
 	cors := server.addCORS()

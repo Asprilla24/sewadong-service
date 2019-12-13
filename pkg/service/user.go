@@ -75,21 +75,8 @@ func (service *Service) CreateUser(request *restful.Request, response *restful.R
 		return
 	}
 
-	userResponse := models.UserResponse{
-		UserID:      createdUser.UserID,
-		Email:       createdUser.Email,
-		Username:    createdUser.Username,
-		RoleID:      createdUser.RoleID,
-		Gender:      createdUser.Gender,
-		PhoneNumber: createdUser.PhoneNumber,
-		Address:     createdUser.Address,
-		Image:       createdUser.Image,
-		UpdatedAt:   createdUser.UpdatedAt,
-		CreatedAt:   createdUser.CreatedAt,
-	}
-
 	result := &models.CreateUserResponse{
-		Result: userResponse,
+		Result: *createdUser,
 	}
 
 	writeResponse(response, http.StatusCreated, result)
@@ -139,21 +126,8 @@ func (service *Service) UpdateUser(request *restful.Request, response *restful.R
 		return
 	}
 
-	userResponse := models.UserResponse{
-		UserID:      updatedUser.UserID,
-		Email:       updatedUser.Email,
-		Username:    updatedUser.Username,
-		RoleID:      updatedUser.RoleID,
-		Gender:      updatedUser.Gender,
-		PhoneNumber: updatedUser.PhoneNumber,
-		Address:     updatedUser.Address,
-		Image:       updatedUser.Image,
-		UpdatedAt:   updatedUser.UpdatedAt,
-		CreatedAt:   updatedUser.CreatedAt,
-	}
-
 	result := &models.UpdateUserResponse{
-		Result: userResponse,
+		Result: *updatedUser,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -172,25 +146,8 @@ func (service *Service) GetAllUser(request *restful.Request, response *restful.R
 		return
 	}
 
-	var usersResponse []models.UserResponse
-	for _, user := range dbResult {
-		userResponse := models.UserResponse{
-			UserID:      user.UserID,
-			Email:       user.Email,
-			Username:    user.Username,
-			RoleID:      user.RoleID,
-			Gender:      user.Gender,
-			PhoneNumber: user.PhoneNumber,
-			Address:     user.Address,
-			Image:       user.Image,
-			UpdatedAt:   user.UpdatedAt,
-			CreatedAt:   user.CreatedAt,
-		}
-		usersResponse = append(usersResponse, userResponse)
-	}
-
 	result := &models.GetUsersResponse{
-		Result: usersResponse,
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -220,21 +177,8 @@ func (service *Service) GetUserByEmailOrUsername(request *restful.Request, respo
 		return
 	}
 
-	userResponse := models.UserResponse{
-		UserID:      dbResult.UserID,
-		Email:       dbResult.Email,
-		Username:    dbResult.Username,
-		RoleID:      dbResult.RoleID,
-		Gender:      dbResult.Gender,
-		PhoneNumber: dbResult.PhoneNumber,
-		Address:     dbResult.Address,
-		Image:       dbResult.Image,
-		UpdatedAt:   dbResult.UpdatedAt,
-		CreatedAt:   dbResult.CreatedAt,
-	}
-
 	result := &models.GetUserResponse{
-		Result: userResponse,
+		Result: *dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -253,7 +197,7 @@ func (service *Service) Login(request *restful.Request, response *restful.Respon
 		return
 	}
 
-	dbResult, err := service.server.GetUserByEmailOrUsername(req.Identifier)
+	dbResult, err := service.server.GetUserByEmailOrUsernameReturnUser(req.Identifier)
 	if err == dao.ErrRecordNotFound {
 		respondErr(response, http.StatusNotFound, messageDatabaseError,
 			"unable to retrieve user")
@@ -284,11 +228,22 @@ func (service *Service) Login(request *restful.Request, response *restful.Respon
 		return
 	}
 
+	roleDetail, err := service.server.GetRoleByRoleID(dbResult.RoleID)
+	if err != nil {
+		respondErr(response, http.StatusInternalServerError, messageDatabaseError,
+			"unable to get role")
+
+		logrus.WithFields(logrus.Fields{"module": "service", "resp": http.StatusInternalServerError}).
+			Error("Unable to get role:", err)
+
+		return
+	}
+
 	userResponse := models.UserResponse{
 		UserID:      dbResult.UserID,
 		Email:       dbResult.Email,
 		Username:    dbResult.Username,
-		RoleID:      dbResult.RoleID,
+		Role:        *roleDetail,
 		Gender:      dbResult.Gender,
 		PhoneNumber: dbResult.PhoneNumber,
 		Address:     dbResult.Address,
@@ -328,20 +283,39 @@ func (service *Service) GetUserByID(request *restful.Request, response *restful.
 		return
 	}
 
-	userResponse := models.UserResponse{
-		UserID:      dbResult.UserID,
-		Email:       dbResult.Email,
-		Username:    dbResult.Username,
-		Gender:      dbResult.Gender,
-		PhoneNumber: dbResult.PhoneNumber,
-		Address:     dbResult.Address,
-		Image:       dbResult.Image,
-		UpdatedAt:   dbResult.UpdatedAt,
-		CreatedAt:   dbResult.CreatedAt,
+	result := &models.GetUserResponse{
+		Result: *dbResult,
 	}
 
-	result := &models.GetUserResponse{
-		Result: userResponse,
+	writeResponse(response, http.StatusOK, result)
+}
+
+// GetUserByRoleID handle get user by role id
+func (service *Service) GetUserByRoleID(request *restful.Request, response *restful.Response) {
+	roleID := request.PathParameter("roleid")
+
+	dbResult, err := service.server.GetUserByRoleID(roleID)
+	if err == dao.ErrRecordNotFound {
+		respondErr(response, http.StatusNotFound, messageDatabaseError,
+			"unable to retrieve user")
+
+		logrus.WithFields(logrus.Fields{"module": "service", "resp": http.StatusNotFound}).
+			Error("Unable to retrieve user:", err)
+
+		return
+	}
+	if err != nil {
+		respondErr(response, http.StatusInternalServerError, messageDatabaseError,
+			"unable to retrieve user")
+
+		logrus.WithFields(logrus.Fields{"module": "service", "resp": http.StatusInternalServerError}).
+			Error("Unable to retrieve user:", err)
+
+		return
+	}
+
+	result := &models.GetUsersResponse{
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)

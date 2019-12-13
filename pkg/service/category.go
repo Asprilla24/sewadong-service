@@ -54,10 +54,8 @@ func (service *Service) CreateCategory(request *restful.Request, response *restf
 		return
 	}
 
-	categoryResponse := models.CategoryResponse(*createdCategory)
-
 	result := &models.CreateCategoryResponse{
-		Result: categoryResponse,
+		Result: *createdCategory,
 	}
 
 	writeResponse(response, http.StatusCreated, result)
@@ -98,10 +96,8 @@ func (service *Service) UpdateCategory(request *restful.Request, response *restf
 		return
 	}
 
-	categoryResponse := models.CategoryResponse(*updatedCategory)
-
 	result := &models.UpdateCategoryResponse{
-		Result: categoryResponse,
+		Result: *updatedCategory,
 	}
 
 	writeResponse(response, http.StatusAccepted, result)
@@ -142,10 +138,8 @@ func (service *Service) DeleteCategory(request *restful.Request, response *restf
 		return
 	}
 
-	categoryResponse := models.CategoryResponse(category)
-
 	result := &models.DeleteCategoryResponse{
-		Result: categoryResponse,
+		Result: models.CategoryResponse{},
 	}
 
 	writeResponse(response, http.StatusNoContent, result)
@@ -164,14 +158,8 @@ func (service *Service) GetAllCategory(request *restful.Request, response *restf
 		return
 	}
 
-	var categoryResponses []models.CategoryResponse
-	for _, category := range dbResult {
-		categoryResponse := models.CategoryResponse(category)
-		categoryResponses = append(categoryResponses, categoryResponse)
-	}
-
 	result := &models.GetCategoriesResponse{
-		Result: categoryResponses,
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -201,10 +189,8 @@ func (service *Service) GetCategoryByCategoryID(request *restful.Request, respon
 		return
 	}
 
-	categoryResponse := models.CategoryResponse(*dbResult)
-
 	result := &models.GetCategoryResponse{
-		Result: categoryResponse,
+		Result: *dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)

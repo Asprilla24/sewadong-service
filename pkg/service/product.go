@@ -64,10 +64,8 @@ func (service *Service) CreateProduct(request *restful.Request, response *restfu
 		return
 	}
 
-	productResponse := models.ProductResponse(*createdProduct)
-
 	result := &models.CreateProductResponse{
-		Result: productResponse,
+		Result: *createdProduct,
 	}
 
 	writeResponse(response, http.StatusCreated, result)
@@ -117,10 +115,8 @@ func (service *Service) UpdateProduct(request *restful.Request, response *restfu
 		return
 	}
 
-	productResponse := models.ProductResponse(*updatedProduct)
-
 	result := &models.UpdateProductResponse{
-		Result: productResponse,
+		Result: *updatedProduct,
 	}
 
 	writeResponse(response, http.StatusAccepted, result)
@@ -170,10 +166,8 @@ func (service *Service) DeleteProduct(request *restful.Request, response *restfu
 		return
 	}
 
-	productResponse := models.ProductResponse(product)
-
 	result := &models.DeleteProductResponse{
-		Result: productResponse,
+		Result: models.ProductResponse{},
 	}
 
 	writeResponse(response, http.StatusNoContent, result)
@@ -192,14 +186,8 @@ func (service *Service) GetAllProduct(request *restful.Request, response *restfu
 		return
 	}
 
-	var productsResponse []models.ProductResponse
-	for _, product := range dbResult {
-		productResponse := models.ProductResponse(product)
-		productsResponse = append(productsResponse, productResponse)
-	}
-
 	result := &models.GetProductsResponse{
-		Result: productsResponse,
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -229,10 +217,8 @@ func (service *Service) GetProductByProductID(request *restful.Request, response
 		return
 	}
 
-	productResponse := models.ProductResponse(*dbResult)
-
 	result := &models.GetProductResponse{
-		Result: productResponse,
+		Result: *dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -262,14 +248,39 @@ func (service *Service) GetProductByCategoryID(request *restful.Request, respons
 		return
 	}
 
-	var productsResponse []models.ProductResponse
-	for _, product := range dbResult {
-		productResponse := models.ProductResponse(product)
-		productsResponse = append(productsResponse, productResponse)
+	result := &models.GetProductsResponse{
+		Result: dbResult,
+	}
+
+	writeResponse(response, http.StatusOK, result)
+}
+
+// GetProductByUserID handle get product by user id
+func (service *Service) GetProductByUserID(request *restful.Request, response *restful.Response) {
+	userID := request.PathParameter("userid")
+
+	dbResult, err := service.server.GetProductByUserID(userID)
+	if err == dao.ErrRecordNotFound {
+		respondErr(response, http.StatusNotFound, messageDatabaseError,
+			"unable to retrieve products")
+
+		logrus.WithFields(logrus.Fields{"module": "service", "resp": http.StatusNotFound}).
+			Error("Unable to retrieve products:", err)
+
+		return
+	}
+	if err != nil {
+		respondErr(response, http.StatusInternalServerError, messageDatabaseError,
+			"unable to retrieve products")
+
+		logrus.WithFields(logrus.Fields{"module": "service", "resp": http.StatusInternalServerError}).
+			Error("Unable to retrieve products:", err)
+
+		return
 	}
 
 	result := &models.GetProductsResponse{
-		Result: productsResponse,
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -299,14 +310,8 @@ func (service *Service) GetProductLikeName(request *restful.Request, response *r
 		return
 	}
 
-	var productsResponse []models.ProductResponse
-	for _, product := range dbResult {
-		productResponse := models.ProductResponse(product)
-		productsResponse = append(productsResponse, productResponse)
-	}
-
 	result := &models.GetProductsResponse{
-		Result: productsResponse,
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)

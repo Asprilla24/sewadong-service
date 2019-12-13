@@ -37,17 +37,16 @@ type UserRequest struct {
 
 // UserResponse response format to send to requester
 type UserResponse struct {
-	UserID      string    `json:"user_id"`
-	Email       string    `json:"email"`
-	Username    string    `json:"username"`
-	IsActive    bool      `json:"is_active"`
-	RoleID      string    `json:"role_id"`
-	Gender      string    `json:"gender"`
-	PhoneNumber string    `json:"phone_number"`
-	Address     string    `json:"address"`
-	Image       string    `json:"image"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	CreatedAt   time.Time `json:"created_at"`
+	UserID      string       `json:"user_id"`
+	Email       string       `json:"email"`
+	Username    string       `json:"username"`
+	Role        RoleResponse `json:"role"`
+	Gender      string       `json:"gender"`
+	PhoneNumber string       `json:"phone_number"`
+	Address     string       `json:"address"`
+	Image       string       `json:"image"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+	CreatedAt   time.Time    `json:"created_at"`
 }
 
 // CreateUserResponse create user response format to send to requester

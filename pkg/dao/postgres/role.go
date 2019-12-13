@@ -12,20 +12,28 @@ import (
 )
 
 // GetRoleByRoleID get role from database by ID
-func (db *DB) GetRoleByRoleID(roleID string) (*models.Role, error) {
+func (db *DB) GetRoleByRoleID(roleID string) (*models.RoleResponse, error) {
 	var role models.Role
 	err := db.conn.Where("role_id=?", roleID).Find(&role).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, dao.ErrRecordNotFound
 	}
 
-	return &role, err
+	roleResponse := models.RoleResponse(role)
+
+	return &roleResponse, err
 }
 
 // GetAllRole get all role from database
-func (db *DB) GetAllRole() ([]models.Role, error) {
+func (db *DB) GetAllRole() ([]models.RoleResponse, error) {
 	var allRole []models.Role
 	err := db.conn.Find(&allRole).Error
 
-	return allRole, err
+	var rolesResponse []models.RoleResponse
+	for _, role := range allRole {
+		roleResponse := models.RoleResponse(role)
+		rolesResponse = append(rolesResponse, roleResponse)
+	}
+
+	return rolesResponse, err
 }

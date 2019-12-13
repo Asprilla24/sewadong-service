@@ -36,16 +36,16 @@ type ProductRequest struct {
 
 // ProductResponse response format to send to requester
 type ProductResponse struct {
-	ProductID   string    `json:"product_id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Price       float32   `json:"price"`
-	PaymentID   string    `json:"payment_id"`
-	CategoryID  string    `json:"category_id"`
-	UserID      string    `json:"user_id"`
-	Image       string    `json:"image"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	CreatedAt   time.Time `json:"created_at"`
+	ProductID   string           `json:"product_id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Price       float32          `json:"price"`
+	PaymentID   string           `json:"payment_id"`
+	Category    CategoryResponse `json:"category"`
+	User        UserResponse     `json:"user"`
+	Image       string           `json:"image"`
+	UpdatedAt   time.Time        `json:"updated_at"`
+	CreatedAt   time.Time        `json:"created_at"`
 }
 
 // CreateProductResponse create product response format to send to requester

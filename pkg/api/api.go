@@ -18,6 +18,7 @@ const (
 	getAllUserEndpoint               = ""
 	getUserByEmailOrUsernameEndpoint = "/identifier/{identifier}"
 	getUserByUserIDEndpoint          = "/{userid}"
+	getUserByRoleIDEndpoint          = "/role/{roleid}"
 	createUserEndpoint               = ""
 	updateUserEndpoint               = ""
 	loginEndpoint                    = "/login"
@@ -28,6 +29,7 @@ const (
 	getAllProductEndpoint          = ""
 	getProductByProductIDEndpoint  = "/{productid}"
 	getProductByCategoryIDEndpoint = "/category/{categoryid}"
+	getProductByUserIDEndpoint     = "/user/{userid}"
 	getProductLikeNameEndpoint     = "/identifier/{identifier}"
 	createProductEndpoint          = ""
 	updateProductEndpoint          = ""
@@ -38,6 +40,11 @@ const (
 	createCategoryEndpoint          = ""
 	updateCategoryEndpoint          = ""
 	deleteCategoryEndpoint          = ""
+
+	createTransactionEndpoint     = ""
+	getTransactionByTransactionID = "/{transactionid}"
+	getTransactionByUserID        = "/user/{userid}"
+	updateTransactionEndpoint     = ""
 )
 
 // AddRouteUser is setup restful route
@@ -75,6 +82,15 @@ func AddRouteUser(service *service.Service, basePath string) *restful.WebService
 		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Doc("Get User by UserID"))
+
+	webService.Route(webService.GET(getUserByRoleIDEndpoint).To(service.GetUserByRoleID).
+		Param(webService.PathParameter("roleid", "the id of role")).
+		Notes("Get users by role id \n \n Retrieves users").
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetUsersResponse{}).
+		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
+		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Doc("Get User by Role ID"))
 
 	webService.Route(webService.GET(getUserByEmailOrUsernameEndpoint).To(service.GetUserByEmailOrUsername).
 		Param(webService.PathParameter("identifier", "the user email or username")).
@@ -175,16 +191,25 @@ func AddRouteProduct(service *service.Service, basePath string) *restful.WebServ
 	webService.Route(webService.GET(getProductByCategoryIDEndpoint).To(service.GetProductByCategoryID).
 		Param(webService.PathParameter("categoryid", "the product category id")).
 		Notes("Get Product by category id \n \n Retrieves Product").
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetProductResponse{}).
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetProductsResponse{}).
 		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
 		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Doc("Get Product by Category ID"))
 
+	webService.Route(webService.GET(getProductByUserIDEndpoint).To(service.GetProductByUserID).
+		Param(webService.PathParameter("userid", "the product user id")).
+		Notes("Get Product by user id \n \n Retrieves Product").
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetProductsResponse{}).
+		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
+		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Doc("Get Product by User ID"))
+
 	webService.Route(webService.GET(getProductLikeNameEndpoint).To(service.GetProductLikeName).
 		Param(webService.PathParameter("identifier", "the product name identifier")).
 		Notes("Get product by identifier \n \n Retrieves product").
-		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.ProductResponse{}).
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetProductsResponse{}).
 		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
 		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
@@ -264,6 +289,55 @@ func AddRouteCategory(service *service.Service, basePath string) *restful.WebSer
 		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
 		Metadata(restfulspec.KeyOpenAPITags, tags).
 		Doc("Delete Category"))
+
+	return webService
+}
+
+// AddRouteTransaction is setup restful route
+func AddRouteTransaction(service *service.Service, basePath string) *restful.WebService {
+	webService := new(restful.WebService)
+	webService.Path(basePath + "/transaction").
+		Consumes(restful.MIME_JSON).
+		Produces(restful.MIME_JSON).
+		ApiVersion("0.0.1").
+		Doc("Transaction")
+
+	tags := []string{"Transaction"}
+
+	webService.Route(webService.POST(createTransactionEndpoint).To(service.CreateTransaction).
+		Reads(models.TransactionRequest{}).
+		Notes("Create Transaction \n \n Create Transaction").
+		Returns(http.StatusCreated, http.StatusText(http.StatusCreated), models.CreateTransactionResponse{}).
+		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
+		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Doc("Create Transaction"))
+
+	webService.Route(webService.GET(getTransactionByUserID).To(service.GetTransactionByUserID).
+		Param(webService.PathParameter("userid", "the user id of transaction")).
+		Notes("Get all transaction by user id \n \n Retrieves all transaction by user id").
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetTransactionsResponse{}).
+		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Doc("Get All Transaction By User ID"))
+
+	webService.Route(webService.GET(getTransactionByTransactionID).To(service.GetTransactionByTransactionID).
+		Param(webService.PathParameter("transactionid", "the id of transaction")).
+		Notes("Get transaction by transaction id \n \n Retrieves transaction").
+		Returns(http.StatusOK, http.StatusText(http.StatusOK), models.GetTransactionResponse{}).
+		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
+		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Doc("Get Transaction by Transaction ID"))
+
+	webService.Route(webService.PUT(updateTransactionEndpoint).To(service.UpdateTransaction).
+		Reads(models.TransactionRequest{}).
+		Notes("Update Transaction \n \n Update Transaction").
+		Returns(http.StatusAccepted, http.StatusText(http.StatusOK), models.UpdateTransactionResponse{}).
+		Returns(http.StatusBadRequest, http.StatusText(http.StatusBadRequest), models.ErrorResponse{}).
+		Returns(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError), models.ErrorResponse{}).
+		Metadata(restfulspec.KeyOpenAPITags, tags).
+		Doc("Update Transaction"))
 
 	return webService
 }

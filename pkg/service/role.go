@@ -27,14 +27,8 @@ func (service *Service) GetAllRole(request *restful.Request, response *restful.R
 		return
 	}
 
-	var rolesResponse []models.RoleResponse
-	for _, role := range dbResult {
-		roleResponse := models.RoleResponse(role)
-		rolesResponse = append(rolesResponse, roleResponse)
-	}
-
 	result := &models.GetRolesResponse{
-		Result: rolesResponse,
+		Result: dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)
@@ -64,13 +58,8 @@ func (service *Service) GetRoleByID(request *restful.Request, response *restful.
 		return
 	}
 
-	roleResponse := models.RoleResponse{
-		RoleID: dbResult.RoleID,
-		Name:   dbResult.Name,
-	}
-
 	result := &models.GetRoleResponse{
-		Result: roleResponse,
+		Result: *dbResult,
 	}
 
 	writeResponse(response, http.StatusOK, result)

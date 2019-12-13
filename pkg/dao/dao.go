@@ -18,29 +18,38 @@ var (
 // Server contains server info interfaces
 type Server interface {
 	// User Dao Interface
-	CreateUser(user models.User) (*models.User, error)
-	GetUserByUserID(userID string) (*models.User, error)
-	GetUserByEmailOrUsername(identifier string) (*models.User, error)
-	GetAllUser() ([]models.User, error)
-	UpdateUser(user models.User) (*models.User, error)
+	CreateUser(user models.User) (*models.UserResponse, error)
+	GetUserByUserID(userID string) (*models.UserResponse, error)
+	GetUserByRoleID(roleID string) ([]models.UserResponse, error)
+	GetUserByEmailOrUsername(identifier string) (*models.UserResponse, error)
+	GetUserByEmailOrUsernameReturnUser(identifier string) (*models.User, error)
+	GetAllUser() ([]models.UserResponse, error)
+	UpdateUser(user models.User) (*models.UserResponse, error)
 
 	// Role Dao Interface
-	GetRoleByRoleID(roleID string) (*models.Role, error)
-	GetAllRole() ([]models.Role, error)
+	GetRoleByRoleID(roleID string) (*models.RoleResponse, error)
+	GetAllRole() ([]models.RoleResponse, error)
 
 	// Product Dao Interface
-	CreateProduct(product models.Product) (*models.Product, error)
-	GetProductByProductID(productID string) (*models.Product, error)
-	GetProductByCategoryID(categoryID string) ([]models.Product, error)
-	GetProductLikeName(identifier string) ([]models.Product, error)
-	GetAllProduct() ([]models.Product, error)
-	UpdateProduct(product models.Product) (*models.Product, error)
+	CreateProduct(product models.Product) (*models.ProductResponse, error)
+	GetProductByProductID(productID string) (*models.ProductResponse, error)
+	GetProductByCategoryID(categoryID string) ([]models.ProductResponse, error)
+	GetProductByUserID(userID string) ([]models.ProductResponse, error)
+	GetProductLikeName(identifier string) ([]models.ProductResponse, error)
+	GetAllProduct() ([]models.ProductResponse, error)
+	UpdateProduct(product models.Product) (*models.ProductResponse, error)
 	DeleteProduct(product models.Product) error
 
 	// Category Dao Interface
-	CreateCategory(category models.Category) (*models.Category, error)
-	GetCategoryByCategoryID(categoryID string) (*models.Category, error)
-	GetAllCategory() ([]models.Category, error)
-	UpdateCategory(category models.Category) (*models.Category, error)
+	CreateCategory(category models.Category) (*models.CategoryResponse, error)
+	GetCategoryByCategoryID(categoryID string) (*models.CategoryResponse, error)
+	GetAllCategory() ([]models.CategoryResponse, error)
+	UpdateCategory(category models.Category) (*models.CategoryResponse, error)
 	DeleteCategory(category models.Category) error
+
+	// Transaction Dao Interface
+	CreateTransaction(transaction models.Transaction) (*models.TransactionResponse, error)
+	GetTransactionByTransactionID(transactionID string) (*models.TransactionResponse, error)
+	GetTransactionByUserID(userID string) ([]models.TransactionResponse, error)
+	UpdateTransaction(transaction models.Transaction) (*models.TransactionResponse, error)
 }
