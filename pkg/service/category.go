@@ -41,6 +41,7 @@ func (service *Service) CreateCategory(request *restful.Request, response *restf
 	category := models.Category{
 		CategoryID: newUUID.String(),
 		Name:       req.Name,
+		Image:      req.Image,
 	}
 
 	createdCategory, err := service.server.CreateCategory(category)

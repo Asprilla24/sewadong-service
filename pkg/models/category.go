@@ -8,18 +8,21 @@ package models
 type Category struct {
 	CategoryID string `json:"category_id" gorm:"primary_key"`
 	Name       string `json:"name"`
+	Image      string `json:"image"`
 }
 
 // CategoryRequest request format to send to requester
 type CategoryRequest struct {
 	CategoryID string `json:"category_id"`
 	Name       string `json:"name"`
+	Image      string `json:"image"`
 }
 
 // CategoryResponse response format to send to requester
 type CategoryResponse struct {
 	CategoryID string `json:"category_id"`
 	Name       string `json:"name"`
+	Image      string `json:"image"`
 }
 
 // GetCategoryResponse get category response format to send to requester
